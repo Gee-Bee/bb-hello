@@ -8,15 +8,32 @@ class List extends Backbone.Collection
 
 class ItemView extends Backbone.View
   tagName: 'li'
-  render: ->
-    @$el.html "#{@model.get 'part1'} #{@model.get 'part2'}"
+  events:
+    'click .swap': 'swap'
+    'click .delete': 'delete'
+  initialize: ->
+    @model.on 'change', @render
+    @model.on 'destroy', @unrender
+  render: =>
+    @$el.html "<span>#{@model.get 'part1'} #{@model.get 'part2'}</span>&nbsp;<span class='swap' style='color: blue; cursor: pointer'>[swap]</span>&nbsp;<span class='delete' style='color: red; cursor: pointer'>[delete]</span>"
     @
+  unrender: =>
+    @$el.remove()
+  swap: ->
+    swapped =
+      part1: @model.get 'part2'
+      part2: @model.get 'part1'
+    @model.set swapped
+  delete: ->
+    @model.destroy()
+
 
 class ListView extends Backbone.View
   el: 'body'
   events:
     'click button#add': 'addItem'
   initialize: ->
+    @counter = 0
     @list = new List()
     @list.on 'add', @appendItem
     @render()
@@ -27,7 +44,7 @@ class ListView extends Backbone.View
     @appendItem item for item in @list.models
   addItem: ->
     item = new Item()
-    item.set 'part2', "#{item.get 'part2'} #{@list.length+1}"
+    item.set 'part2', "#{item.get 'part2'} #{++@counter}"
     @list.add item
   appendItem: (item) =>
     itemView = new ItemView
@@ -35,4 +52,4 @@ class ListView extends Backbone.View
     $('ul', @el).append itemView.render().el
 
 $ ->
-  listView = new ListView()
+  window.listView = new ListView()
