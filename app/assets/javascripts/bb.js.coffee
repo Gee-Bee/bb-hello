@@ -1,9 +1,10 @@
-class ListView
+class ListView extends Backbone.View
   el: 'body'
   constructor: ->
+    super()
     @render()
   render: ->
-    $(@el).append '<ul><li>Hello World</li></ul>'
+    @$el.append '<ul><li>Hello World</li></ul>'
 
 $ ->
-  window.listView = new ListView()
+  listView = new ListView()
