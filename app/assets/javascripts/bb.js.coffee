@@ -6,6 +6,12 @@ class Item extends Backbone.Model
 class List extends Backbone.Collection
   model: Item
 
+class ItemView extends Backbone.View
+  tagName: 'li'
+  render: ->
+    @$el.html "#{@model.get 'part1'} #{@model.get 'part2'}"
+    @
+
 class ListView extends Backbone.View
   el: 'body'
   events:
@@ -19,12 +25,14 @@ class ListView extends Backbone.View
       .append '<button id="add">Add list item</button>'
       .append '<ul></ul>'
     @appendItem item for item in @list.models
-  addItem: -> # add item to collection
+  addItem: ->
     item = new Item()
     item.set 'part2', "#{item.get 'part2'} #{@list.length+1}"
     @list.add item
-  appendItem: (item) => # append item to listview
-    $('ul', @el).append "<li>#{item.get 'part1'} #{item.get 'part2'}</li>"
+  appendItem: (item) =>
+    itemView = new ItemView
+      model: item
+    $('ul', @el).append itemView.render().el
 
 $ ->
   listView = new ListView()
